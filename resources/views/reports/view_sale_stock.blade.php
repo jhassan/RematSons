@@ -7,7 +7,7 @@
 		<legend>View Sale Stock</legend>
 	</div>	
 	<div class="panel-body">
-			<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="example">
+			<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered">
 			<thead>
 				<tr>
 					<th>Sale Date</th>
@@ -33,23 +33,26 @@
 						<td class="text-right">{{ number_format($stock->total_amount) }}</td>
 					</tr>
 				@endforeach
+			</tbody>
+			</table>
+			<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered">
+			<thead>
 				<tr>
 					<th>Total:</th>
-					<th></th>
-					<th></th>
-					<th></th>
-					<th class="text-right">{{number_format($total_quantity)}}</th>
-					<th class="text-right"></th>
-					<th class="text-right"></th>
-					<th class="text-right">{{number_format($total_amount)}}</th>
+					<th class="text-right">Quantity : {{number_format($total_quantity)}}</th>
+					<th class="text-right">Amount : {{number_format($total_amount)}}</th>
 				</tr>
 			</tbody>
 			</table>
+
 			{{ $all_stcok_sale->render() }}
 			<input type="hidden" value="<?php echo csrf_token(); ?>" name="_token">
 		</div>	
 	</div>
 </div>
+<style type="text/css">
+table {margin-bottom: 0px !important;}
+</style>
 @endsection
 
 @section('custom_js')

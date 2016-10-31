@@ -16,12 +16,18 @@ use App\PurchaseStockMaster;
 use App\PurchaseStockDetail;
 use App\ProductStock;
 use App\Product;
+use App\Category;
 use Redirect;
 use Auth;
 use App\ItemPrices;
 
 class PurchaseStockController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+    
     /**
      * Display a listing of the resource.
      *
@@ -30,9 +36,14 @@ class PurchaseStockController extends Controller
     public function index()
     {
         // Get all purchase stock
-        $stock_data = new PurchaseStockMaster;
-        $arrayStock = $stock_data->view_purchase_stock();
-        return View('purchase_stock.index', compact('arrayStock'));
+        $data = new PurchaseStockMaster;
+        $array_all_purchase_stock = $data->view_purchase_stock();
+        $all_stcok_purchase = $array_all_purchase_stock['purchasa_all_stock'];
+        $total_quantity = $array_all_purchase_stock['sum_all_stock'][0]->TotalQuantity;
+        $total_amount = $array_all_purchase_stock['sum_all_stock'][0]->TotalAmount;
+        //$arrayStock = $stock_data->view_purchase_stock();
+        return View('purchase_stock.index',compact('all_stcok_purchase','total_quantity','total_amount'));
+        //return View('purchase_stock.index', compact('arrayStock'));
     }
 
     public function add()
@@ -43,8 +54,12 @@ class PurchaseStockController extends Controller
 
         // Get all Products
         $product_data = new Product;
-        $arrayProducts = $product_data->all_products('p');        
-        return View('purchase_stock.add', compact('arrayParties', 'arrayProducts'));
+        $arrayProducts = $product_data->all_products('p');
+
+        // Get all Categories
+        $category_data = new Category;
+        $array_category = $category_data->all_category();        
+        return View('purchase_stock.add', compact('arrayParties', 'arrayProducts', 'array_category'));
     }
 
     /**
@@ -57,6 +72,7 @@ class PurchaseStockController extends Controller
         //print_r(Input::all()); die;
         //DB::transaction(function () {
         $rules = array(
+            'category_id' => 'required',
             'party_id'  => 'required',
             'bilty_no'  => 'required',
             'adda_address'  => 'required',
@@ -74,6 +90,7 @@ class PurchaseStockController extends Controller
         //$data = new PurchaseStockMaster();
         
         // Insert in purchase master table
+        $category_id = Input::get('category_id');
         $party_id = Input::get('party_id');
         $bilty_no = Input::get('bilty_no');
         $total_quantity = Input::get('total_quantity');
@@ -84,6 +101,7 @@ class PurchaseStockController extends Controller
         $adda_address = Input::get('adda_address');
         $purchase_date = date("Y-m-d",strtotime(Input::get('purchase_date')));
         $arrayInsert = array('party_id'         => $party_id, 
+                                "category_id"    => $category_id,
                                 "created_at"    => $date,
                                 "purchase_date" => $purchase_date,
                                 "bilty_no"      => $this->RemoveComma($bilty_no),
@@ -123,6 +141,9 @@ class PurchaseStockController extends Controller
                             "purchase_stock_master_id" => $last_stock_id,
                             "product_credit"   => Input::get("quantity.$i"),
                             "product_id"       => Input::get("product_id.$i"), 
+                            "category_id"      => $category_id,
+                            "party_id"         => $party_id,
+                            "sale_purchase_date" => $purchase_date,
                             "created_at"       => $date               
                         );
                 // Update/Insert List Price
@@ -191,6 +212,10 @@ class PurchaseStockController extends Controller
             $product_data = new Product;
             $arrayProducts = $product_data->all_products('p');
 
+            // Get all Categories
+            $category_data = new Category;
+            $array_category = $category_data->all_category(); 
+
             // Master Data 
             $master_data = DB::table('purchase_stock_master')->where('id', $id)->first();
             // Details Data
@@ -198,7 +223,7 @@ class PurchaseStockController extends Controller
                               ->join('products', 'products.id', '=', 'purchase_stock_detail.product_id')  
                               ->select('purchase_stock_detail.*','products.name AS product_name')
                               ->where('stock_master_id', $id)->get();
-            return View('purchase_stock.edit', compact('master_data','arrayParties','arrayProducts', 'detail_data'));
+            return View('purchase_stock.edit', compact('master_data','arrayParties','arrayProducts', 'detail_data', 'array_category'));
         }
         catch (TestimonialNotFoundException $e) {
             return Redirect::route('purchase_stock.edit')->with('error', 'Error Message');

@@ -61,6 +61,8 @@ Route::group(
       Route::get('{id}/edit', array('as' => 'sale_stock.update', 'uses' => 'SaleStockController@edit'));
       Route::post('{id}/edit', 'SaleStockController@update');
       Route::get('delete_product', array('as'=>'delete_product', 'uses' => 'SaleStockController@destroy'));
+      Route::get('check_total_stcok', array('as'=>'check_total_stcok', 'uses' => 'SaleStockController@check_total_stcok'));
+      Route::get('{id}/check_item_stock_detail', array('as'=>'check_item_stock_detail', 'uses' => 'SaleStockController@check_item_stock_detail'));
   });
 
 // Reports

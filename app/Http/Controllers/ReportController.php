@@ -42,7 +42,9 @@ class ReportController extends Controller
     public function view_today_stock()
     {
     	$data = new Report;
-	 	$array_today_stock = $data->view_today_stock();
-	 	return View('reports.view_today_stock',compact('array_today_stock'));
+        $array_all_stock = $data->view_today_stock();
+        $all_stcok = $array_all_stock['today_stock'];
+        $total_quantity = $array_all_stock['sum_all_stock'][0]->TotalQuantity;
+	 	return View('reports.view_today_stock',compact('all_stcok','total_quantity'));
     }
 }

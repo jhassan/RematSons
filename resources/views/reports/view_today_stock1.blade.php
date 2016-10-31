@@ -10,17 +10,17 @@
 			<table cellpadding="0" cellspacing="0" border="0" class="table table-responsive table-bordered">
 			<thead>
 				<tr>
-					<th width="33%">Item Name</th>
-					<th width="33%">Stock In Quantity</th>
-					<th width="33%">View</th>
+					<th>Item Name</th>
+					<th>Stock In Quantity</th>
+					<th>View</th>
 				</tr>
 			</thead>
 			<tbody>
 				@foreach($all_stcok as $stock)
 					<tr class="odd gradeX">
 						<td>{{ $stock->product_name }}</td>
-						<td>{{ number_format($stock->TotalStock) }}</td>
-						<td style="padding:2px;"><a href="/sale_stock/{{ $stock->product_id }}/check_item_stock_detail" class="btn btn-default" id="{{ $stock->product_id }}" target="_blank">View Detail</a></td>
+						<td>{{ $stock->TotalStock }}</td>
+						<td style="padding:2px;"><a href="#" class="btn btn-default ShowItemStockModal" id="{{ $stock->product_id }}" data-toggle="modal" data-target=".ItemStockModal" data-remote="false">View Detail</a></td>
 					</tr>
 				@endforeach
 			</tbody>
@@ -28,9 +28,9 @@
 			<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered">
 			<thead>
 				<tr>
-					<th width="33%">Total Quantity:</th>
-					<th class="text-left" width="33%">{{number_format($total_quantity)}}</th>
-					<th width="33%"></th>
+					<th>Total:</th>
+					<th class="text-left">Quantity : {{number_format($total_quantity)}}</th>
+					<th></th>
 				</tr>
 			</thead>
 			</table>
@@ -39,10 +39,6 @@
 		</div>	
 	</div>
 </div>
-<style type="text/css">
-table {margin-bottom: 0px !important;}
-</style>
-
 <!-- Default bootstrap modal example -->
 <div class="modal fade ItemStockModal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog">

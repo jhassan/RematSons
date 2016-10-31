@@ -21,7 +21,19 @@
 			<fieldset>
 				<div class="panel-heading">
 					<legend>Add Sale Stock</legend>
-				</div>	
+				</div>
+				<div class="form-group col-sm-3">
+					<div>
+  						<label>Select Category</label>
+						<div class="bfh-selectbox hide" data-name="category_id" id="category_id" data-value="" data-filter="true">
+						  <div data-value="">Select Category</div>
+						  @foreach($array_category as $category)
+						  	<div data-value="{{ $category->id }}">{{ $category->category_name }}</div>
+						  @endforeach
+						</div>
+  					</div>
+				</div>
+				<div style="clear:both"></div>	
 				<div class="form-group col-sm-3">
 					<div>
   						<label>Select Party</label>
@@ -51,7 +63,7 @@
 					<input class="form-control" placeholder="Cargo Address" maxlength="15" name="adda_address" type="text" value="">
 				</div>
 				<div class="panel-heading">
-					<legend>Add All Sale Items</legend>
+					<legend>Add All Sale Items <span style="float:right;" id="current_stock"></span></legend>
 				</div>
 				<div class="form-group col-sm-5">
 					<div>
@@ -64,13 +76,13 @@
 						</div>
   					</div>
 				</div>
-				<div class="form-group col-sm-1" style="padding-right: 0px;">
-					<label>Quantity</label>
-					<input class="form-control number_only" placeholder="Qty" maxlength="15" name="quantity" id="quantity" type="text" value="">
-				</div>
 				<div class="form-group col-sm-2">
 					<label>List Price</label>
 					<input class="form-control number_only" placeholder="List Price" maxlength="15" name="list_price" id="list_price" type="text" value="">
+				</div>
+				<div class="form-group col-sm-1" style="padding-right: 0px;">
+					<label>Quantity</label>
+					<input class="form-control number_only" placeholder="Qty" maxlength="15" name="quantity" id="quantity" type="text" value="">
 				</div>
 				<div class="form-group col-sm-2">
 					<div>
@@ -151,23 +163,12 @@
 @section('custom_js')
 	<script type="text/javascript">
 		$(document).ready(function () {
-			// Get Selected Product id
-			// $("#party_id").on('change', function () {
-			// 	alert('adfafad');
-			// });
-			
-			// $(".get_selected_options ul li a").on('click', function (e) {
-			// 	alert('test');
-			//     var selText = $(this).attr('data-option'); 
-			//     alert(selText);
-			//     //$(this).parents('.btn-group').find('.dropdown-toggle').html(selText+' <span class="caret"></span>');
-			// });
-
 			// shows drop down list when page loaded
 			$("#product_id").removeClass('hide');
 			$("#discount").removeClass('hide');
 			$("#party_id").removeClass('hide');
-			
+			$("#current_stock").html('');
+			$("#category_id").removeClass('hide');
 			// submit form
 			$("#submit_button").click(function (){
 				$("#purchase_form").submit();
@@ -177,12 +178,6 @@
 			// Add more items
 			var counter = 0;
 			$("#addItems").click(function () {
-				var item_counter = $("#item_counter").val();
-				counter = parseInt(item_counter) + parseInt(1);
-				var inner_counter = $("#inner_counter").html();
-				$("#item_counter").val(counter);
-				$("#text_total_item").html(counter);
-				$("#grand_total_item").val(counter);
 				var product_value = $("#product_id").find('.bfh-selectbox-option').html();
 				var product_id = $("#product_id").find("input[name='product_id']").val();
 				var discount_percent = $("#discount").find("input[name='discount']").val();
@@ -202,8 +197,26 @@
 				var net_price = (list_price - (list_price * 1/100 * discount_percent)).toFixed(2);
 				var total_amount = quantity * net_price;
 				var list_total_amount = (total_amount).toFixed(2);
-				if(!AlreadyId && product_value != "Select Item" && quantity != "" && list_price != "" && total_amount != 0)
+				// Split string of current stock value
+				var current_stock = $("#current_stock").html();
+				var array = current_stock.split(':');
+				var now_stock_value = array[1].replace(',', '');
+				var stock = true;
+				if(parseInt(quantity) > parseInt(now_stock_value))
 				{
+					alert('Please add quantity less than Current Stock Value!');
+					stock = false;
+					emptyFieldss();
+					return false;
+				}
+				if(!AlreadyId && product_value != "Select Item" && quantity != "" && list_price != "" && total_amount != 0 && stock == true)
+				{
+					var item_counter = $("#item_counter").val();
+					counter = parseInt(item_counter) + parseInt(1);
+					var inner_counter = $("#inner_counter").html();
+					$("#item_counter").val(counter);
+					$("#text_total_item").html(counter);
+					$("#grand_total_item").val(counter);
 					$("#div_total_detail").removeClass('hide');
 					var str = "";
 			          str = "<tr id='Product_"+product_id+"'>";
@@ -257,7 +270,7 @@
 					$("#text_total_items").html(counter - 1);
 					return false;		
 				}
-				else
+				else if(stock == true)
 				{
 					alert('Product already added!');
 					$("#item_counter").val(counter - 1);
@@ -270,7 +283,6 @@
 			// Delete Items
 			$(document).on('click', '.deleteItems', function (){
 				var id = $(this).attr('id');
-				//var counter = $("#item_counter").val();
 				$("#item_counter").val( $("#item_counter").val() - 1);
 				$("#text_total_item").html( $("#text_total_item").html() - 1 );
 				$("#grand_total_item").val( $("#grand_total_item").val() - 1 );
@@ -303,9 +315,6 @@
 				$("#grand_total_amount").val(addCommas(grand_total_amount1));
 				$("#text_total_amount").html(addCommas(grand_total_amount1));
 				// For Total Items
-				//$("#grand_total_item").val(counter - 1);
-				//$("#text_total_item").html(counter - 1);
-				//console.log(counter);
 				if(($("#item_counter").val()) == 0)
 					$("#div_total_detail").addClass('hide');
 				$("#Product_"+id).remove();
@@ -344,7 +353,21 @@
 		}
 		function dropdownToggle() {
 		    var selected_id = $(this).attr("data-option");
-		    console.log(selected_id);
+		    var selected_value = $(this).html();
+		    // Get Current Stock
+		    $.ajax({
+	              type: "GET",
+	          	  url: '/sale_stock/check_total_stcok',
+	              data: { selected_id: selected_id }
+	          }).done(function( response ) {
+	          	var data = JSON.parse(response);
+	          	var current_stock = data.current_stock;
+	          	var list_price = data.list_price;
+	              $("#current_stock").html('');
+		    	  $("#current_stock").html(selected_value+', '+'In Stock : '+ current_stock );
+		    	  $("#list_price").val('');
+		    	  $("#list_price").val(list_price);
+	          });
 		}
 	</script>
 @endsection

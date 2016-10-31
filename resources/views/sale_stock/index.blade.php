@@ -10,7 +10,7 @@
 		   <div class="alert alert-info">{{ Session::get('purchase_stock_edit') }}</div>
 		@endif
 		<div class="panel-body">
-			<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="example">
+			<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered">
 			<thead>
 				<tr>
 					<th>Sale Date</th>
@@ -23,7 +23,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				@foreach($arrayStock as $stock)
+				@foreach($all_stcok_sale as $stock)
 					<tr class="odd gradeX" id="row_{{ $stock->id }}">
 						<td>{{ date("d-m-Y", strtotime($stock->sale_date)) }}</td>
 						<td>{{ $stock->party_name }}</td>
@@ -36,10 +36,27 @@
 				@endforeach
 			</tbody>
 			</table>
+			<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered">
+			<thead>
+				<tr>
+					<th>Total:</th>
+					<th class="text-right">Quantity : {{number_format($total_quantity)}}</th>
+					<th class="text-right">Amount : {{number_format($total_amount)}}</th>
+					<th></th>
+					<th></th>
+					<th></th>
+				</tr>
+			</tbody>
+			</table>
+
+			{{ $all_stcok_sale->render() }}
 			<input type="hidden" value="<?php echo csrf_token(); ?>" name="_token">
 		</div>
 	</div>
 </div>
+<style type="text/css">
+table {margin-bottom: 0px !important;}
+</style>
 <div id="dialog-confirm-delete" title="Delete Reocrs" style="display:none;">Do you want to delete this record?</div>
 @endsection
 

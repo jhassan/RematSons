@@ -24,6 +24,18 @@
 				</div>	
 				<div class="form-group col-sm-3">
 					<div>
+  						<label>Select Category</label>
+						<div class="bfh-selectbox hide" data-name="category_id" id="category_id" data-value="" data-filter="true">
+						  <div data-value="">Select Category</div>
+						  @foreach($array_category as $category)
+						  	<div data-value="{{ $category->id }}">{{ $category->category_name }}</div>
+						  @endforeach
+						</div>
+  					</div>
+				</div>
+				<div style="clear:both"></div>
+				<div class="form-group col-sm-3">
+					<div>
   						<label>Select Party</label>
 						<div class="bfh-selectbox hide" data-name="party_id" id="party_id" data-value="" data-filter="true">
 						  <div data-value="">Select Party</div>
@@ -131,6 +143,7 @@
 		</div>
 	</div>
 </div>
+
 <input type="hidden" id="item_counter" name="item_counter" value="0" />
 <style type="text/css">
 .amount_text {
@@ -151,10 +164,12 @@
 @section('custom_js')
 	<script type="text/javascript">
 		$(document).ready(function () {
+			
 			// shows drop down list when page loaded
 			$("#product_id").removeClass('hide');
 			$("#discount").removeClass('hide');
 			$("#party_id").removeClass('hide');
+			$("#category_id").removeClass('hide');
 			
 			// submit form
 			$("#submit_button").click(function (){

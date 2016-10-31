@@ -18,7 +18,10 @@ class Product extends Model
 		{
 			$arrayProduct = DB::table('products')
 				->join('products_stock', 'products_stock.product_id', '=', 'products.id')
-				->orderBy('name', 'asc')->get();
+				->select('products.*')
+				->groupBy('products.id')
+				->orderBy('name', 'asc')
+				->get();
 		}
 		return $arrayProduct;
 	}
