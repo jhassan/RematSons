@@ -10,10 +10,16 @@ use Validator;
 use Input;
 use Session;
 use App\Party;
+use App\COA;
 use Redirect;
 
 class PartyController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+    
     /**
      * Display a listing of the resource.
      *
@@ -53,8 +59,37 @@ class PartyController extends Controller
         $data->phone_no = Input::get('phone_no');
         $data->city = Input::get('city');
         $data->type_id = Input::get('type_id');
+        $coa_credit = str_replace(",","",Input::get("coa_credit"));
+        $coa_debit = str_replace(",","",Input::get("coa_debit"));
+        $party = new Party();
+        if($data->type_id == 1)
+        {
+            $coa_code = $party->get_next_coa('p');
+            $account_type = 'p';
+        }
+        elseif($data->type_id == 2)
+        {
+            $coa_code = $party->get_next_coa('s');
+            $account_type = 's';
+        }
+        else
+        {
+            $coa_code = $party->get_next_coa('g');
+            $account_type = 's';
+        }
         
         if($data->save()){
+            $insertedId = $data->id;
+            // Create Party COA
+            $arrDataCOA[] = array( 
+                        "coa_code"    => $coa_code,
+                        "coa_account" => Input::get("name"),
+                        "coa_credit"  => (int)$coa_credit, 
+                        "coa_debit"   => (int)$coa_debit,
+                        "account_type"=> $account_type,
+                        "party_id"    => (int)$insertedId       
+                    );
+            COA::insert($arrDataCOA);
             Session::flash('message', "Party added successfully!");
             return Redirect::back();
         }
@@ -100,7 +135,8 @@ class PartyController extends Controller
     {
         try {
             $parties = DB::table('parties')->where('id', $id)->first();
-            return View('parties.edit', compact('parties'));
+            $coa = DB::table('coa')->where('party_id', $id)->first();
+            return View('parties.edit', compact('parties','coa'));
         }
         catch (TestimonialNotFoundException $e) {
             return Redirect::route('parties.edit')->with('error', 'Error Message');
@@ -135,6 +171,8 @@ class PartyController extends Controller
         $data->phone_no = Input::get('phone_no');
         $data->city = Input::get('city');
         $data->type_id = Input::get('type_id');
+        $coa_credit = str_replace(",","",Input::get("coa_credit"));
+        $coa_debit = str_replace(",","",Input::get("coa_debit"));
         
         Party::where('id', $id)->update(
             [
@@ -143,6 +181,11 @@ class PartyController extends Controller
             'phone_no' => $data->phone_no,
             'city' => $data->city,
             'type_id' => $data->type_id,
+            ]);
+        COA::where('party_id', $id)->update(
+            [
+            'coa_credit' => (int)$coa_credit,
+            'coa_debit' => (int)$coa_debit
             ]);
         $arrayParties = DB::table('parties')->orderBy('id', 'desc')->get();
         Session::flash('message_update', "Party updated successfully!");

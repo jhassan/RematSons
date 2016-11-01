@@ -48,6 +48,14 @@
 						</div>
   					</div>
 				</div>
+				<div class="form-group col-sm-3">
+					<label>Debit</label>
+					<input class="form-control number_only" placeholder="Debit" maxlength="15" name="coa_debit" type="text" value="">
+				</div>
+				<div class="form-group col-sm-3">
+					<label>Credit</label>
+					<input class="form-control number_only" placeholder="Credit" maxlength="15" name="coa_credit" type="text" value="">
+				</div>
 			</fieldset>
 			<div class="form-group col-sm-3">
 		      <button type="submit" class="btn btn-primary">Save</button>

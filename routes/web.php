@@ -73,4 +73,12 @@ Route::group(
       Route::get('view_today_stock', array('as' => 'add/view_today_stock', 'uses' => 'ReportController@view_today_stock'));
   });
 
+// List Price
+Route::group(
+  array('prefix' => '/list_price','before' => ''), function () {
+      Route::get('/', array('as' => '/', 'uses' => 'ListPriceController@index'));
+      Route::get('update_list_price', array('as'=>'update_list_price', 'uses' => 'ListPriceController@update_list_price'));
+      
+  });
+
 

@@ -216,6 +216,10 @@ class SaleStockController extends Controller
             $product_data = new Product;
             $arrayProducts = $product_data->all_products('s');
 
+            // Get all Categories
+            $category_data = new Category;
+            $array_category = $category_data->all_category(); 
+
             // Master Data 
             $master_data = DB::table('sale_stock_master')->where('id', $id)->first();
             // Details Data
@@ -224,7 +228,7 @@ class SaleStockController extends Controller
                               ->select('sale_stock_detail.*','products.name AS product_name')
                               ->where('sale_stock_master_id', $id)->get();
                               //print_r($detail_data); die;
-            return View('sale_stock.edit', compact('master_data','arrayParties','arrayProducts', 'detail_data'));
+            return View('sale_stock.edit', compact('master_data','arrayParties','arrayProducts', 'detail_data', 'array_category'));
         }
         catch (TestimonialNotFoundException $e) {
             return Redirect::route('sale_stock.edit')->with('error', 'Error Message');

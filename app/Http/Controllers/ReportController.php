@@ -17,6 +17,11 @@ use App\Report;
 
 class ReportController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+    
     // View Purchase Report
     public function view_purchase_stock()
     {

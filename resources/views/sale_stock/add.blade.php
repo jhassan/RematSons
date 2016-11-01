@@ -22,7 +22,7 @@
 				<div class="panel-heading">
 					<legend>Add Sale Stock</legend>
 				</div>
-				<div class="form-group col-sm-3">
+				<div class="form-group col-sm-2">
 					<div>
   						<label>Select Category</label>
 						<div class="bfh-selectbox hide" data-name="category_id" id="category_id" data-value="" data-filter="true">
@@ -33,8 +33,8 @@
 						</div>
   					</div>
 				</div>
-				<div style="clear:both"></div>	
-				<div class="form-group col-sm-3">
+				<!-- <div style="clear:both"></div> -->	
+				<div class="form-group col-sm-2">
 					<div>
   						<label>Select Party</label>
 						<div class="bfh-selectbox hide" data-name="party_id" id="party_id" data-value="" data-filter="true">
@@ -58,7 +58,7 @@
 					<label>Bilty #</label>
 					<input class="form-control" placeholder="Bilty #" maxlength="15" name="bilty_no" type="text" value="">
 				</div>
-				<div class="form-group col-sm-4">
+				<div class="form-group col-sm-3">
 					<label>Cargo Address</label>
 					<input class="form-control" placeholder="Cargo Address" maxlength="15" name="adda_address" type="text" value="">
 				</div>

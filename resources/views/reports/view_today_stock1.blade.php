@@ -48,7 +48,7 @@
         <h4 class="modal-title" id="myModalLabel">Item Details Sale/Purchase</h4>
       </div>
       <div class="modal-body" id="fill_items_details">
-      	<!-- @include('dialogs.view_item_details') -->
+      	@include('dialogs.view_item_details')
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
