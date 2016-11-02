@@ -17,7 +17,7 @@
 		@endif
 		<div class="panel-body">
 			<form role="form" method="POST" action="{{ url('/products/add_new') }}">
-			<input type="hidden" name="_token" value="{{ csrf_token() }}" />
+			<input type="hidden" name="_token" value="{!! csrf_token() !!}" />
 			<fieldset>
 				<div class="panel-heading">
 					<legend>Add Product</legend>

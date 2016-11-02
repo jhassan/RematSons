@@ -17,6 +17,9 @@ use App\PurchaseStockDetail;
 use App\ProductStock;
 use App\Product;
 use App\Category;
+use App\COA;
+use App\PurchaseVoucherMaster;
+use App\PurchaseVoucherDetail;
 use Redirect;
 use Auth;
 use App\ItemPrices;
@@ -88,10 +91,12 @@ class PurchaseStockController extends Controller
             return Redirect::back()->withInput()->withErrors($validator);
         }
         //$data = new PurchaseStockMaster();
-        
+        // Get COA
+        $get_coa = new COA;
         // Insert in purchase master table
         $category_id = Input::get('category_id');
         $party_id = Input::get('party_id');
+        $coa_code = $get_coa->party_coa($party_id);
         $bilty_no = Input::get('bilty_no');
         $total_quantity = Input::get('total_quantity');
         $grand_total = Input::get('grand_total');
@@ -157,6 +162,40 @@ class PurchaseStockController extends Controller
             ItemPrices::insert($arrDataListPrice);
             ProductStock::insert($arrDataStock);
             PurchaseStockDetail::insert($arrData);
+            // Put all transections
+
+            // Master
+            $arrayInsertMaster = array('party_id'=> $party_id, 
+                                "category_id"    => $category_id,
+                                "stock_master_id"=> $last_stock_id,
+                                "created_at"    => $date,
+                                "voucher_type"  => "CP",
+                                "purchase_date" => $purchase_date,
+                                "bilty_no"      => $this->RemoveComma($bilty_no),
+                                "total_quantity"=> $this->RemoveComma($total_quantity),
+                                "grand_total"   => $this->RemoveComma($grand_total),
+                                "total_item"    => $this->RemoveComma($total_item),
+                                "adda_address"  => $adda_address,
+                                "user_id"       => $user_id);
+            $account_last_master_id = PurchaseVoucherMaster::insertGetId($arrayInsertMaster);
+            // Insert in sales detail table
+            $purchase_descriptions = $purchase_date . " Purchase Invoice";
+            $InventoryDebitAcc = "100000";
+            $PartyCreditAcc = $coa_code;
+            $DiscountCreditAcc = "100001";
+            $arrTrans[] = array("coa" => $InventoryDebitAcc, "desc" => $purchase_descriptions,  "debit" => $this->RemoveComma($grand_total), "credit" => 0);
+            $arrTrans[] = array("coa" => $PartyCreditAcc, "desc" => $purchase_descriptions,"debit" => 0, "credit" => $this->RemoveComma($grand_total));
+            $arrTrans[] = array("coa" => $DiscountCreditAcc, "desc" => $purchase_descriptions,"debit" => 0, "credit" => 0); // Discount Amount
+            foreach($arrTrans as $tran)
+            {
+                $arrayInsertDetail = array("account_stock_master_id" => $account_last_master_id,
+                            "coa_code" => $tran["coa"],
+                            "purchase_debit_amount" => $tran["debit"],
+                            "purchase_descriptions" => $tran["desc"],
+                            "stock_master_id" => $last_stock_id,
+                            "purchase_credit_amount" => $tran["credit"]);
+                PurchaseVoucherDetail::insert($arrayInsertDetail);
+            }
         }
 
         if(empty($id))
@@ -263,6 +302,9 @@ class PurchaseStockController extends Controller
         $removeMaster = PurchaseStockMaster::where('id', '=', $id)->delete();
         $removeDetails = PurchaseStockDetail::where('stock_master_id', '=', $id)->delete();
         $removeMaster = ProductStock::where('purchase_stock_master_id', '=', $id)->delete();
+        // Remove Vouchers
+        $removeVoucherMaster = PurchaseVoucherMaster::where('stock_master_id', '=', $id)->delete();
+        $removeVoucherDetail = PurchaseVoucherDetail::where('stock_master_id', '=', $id)->delete();
 
         if($from != "update")
         {
