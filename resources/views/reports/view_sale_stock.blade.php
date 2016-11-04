@@ -15,7 +15,7 @@
 					<th>Bility #</th>
 					<th>Item Name</th>
 					<th>Quantity</th>
-					<th>Brand Name</th>
+					<th>List Price</th>
 					<th>Sale Price</th>
 					<th>Total Amount</th>
 				</tr>

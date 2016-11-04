@@ -82,7 +82,7 @@ class PurchaseStockController extends Controller
             'quantity'  => 'required',
             'product_id' => 'required'
         );
-        $date = date("Y-m-d H:i:s");
+        
         // Create a new validator instance from our validation rules
         $validator = Validator::make(Input::all(), $rules);
 
@@ -91,6 +91,8 @@ class PurchaseStockController extends Controller
             return Redirect::back()->withInput()->withErrors($validator);
         }
         //$data = new PurchaseStockMaster();
+        DB::transaction(function () {
+        $date = date("Y-m-d H:i:s");    
         // Get COA
         $get_coa = new COA;
         // Insert in purchase master table
@@ -167,7 +169,7 @@ class PurchaseStockController extends Controller
             // Master
             $arrayInsertMaster = array('party_id'=> $party_id, 
                                 "category_id"    => $category_id,
-                                "stock_master_id"=> $last_stock_id,
+                                "purchase_stock_master_id"=> $last_stock_id,
                                 "created_at"    => $date,
                                 "voucher_type"  => "CP",
                                 "purchase_date" => $purchase_date,
@@ -179,6 +181,7 @@ class PurchaseStockController extends Controller
                                 "user_id"       => $user_id);
             $account_last_master_id = PurchaseVoucherMaster::insertGetId($arrayInsertMaster);
             // Insert in sales detail table
+            $purchase_date = date("d-m-Y", strtotime($purchase_date));
             $purchase_descriptions = $purchase_date . " Purchase Invoice";
             $InventoryDebitAcc = "100000";
             $PartyCreditAcc = $coa_code;
@@ -192,18 +195,18 @@ class PurchaseStockController extends Controller
                             "coa_code" => $tran["coa"],
                             "purchase_debit_amount" => $tran["debit"],
                             "purchase_descriptions" => $tran["desc"],
-                            "stock_master_id" => $last_stock_id,
+                            "purchase_stock_master_id" => $last_stock_id,
                             "purchase_credit_amount" => $tran["credit"]);
                 PurchaseVoucherDetail::insert($arrayInsertDetail);
             }
         }
-
+        }); // End transections 
         if(empty($id))
         {
             Session::flash('purchase_message', "Purchase Stock added successfully!");
             return Redirect::back();    
         }
-       // }); // End transections 
+        
     }
 
     // Remove commas in a numeric number
@@ -303,8 +306,8 @@ class PurchaseStockController extends Controller
         $removeDetails = PurchaseStockDetail::where('stock_master_id', '=', $id)->delete();
         $removeMaster = ProductStock::where('purchase_stock_master_id', '=', $id)->delete();
         // Remove Vouchers
-        $removeVoucherMaster = PurchaseVoucherMaster::where('stock_master_id', '=', $id)->delete();
-        $removeVoucherDetail = PurchaseVoucherDetail::where('stock_master_id', '=', $id)->delete();
+        $removeVoucherMaster = PurchaseVoucherMaster::where('purchase_stock_master_id', '=', $id)->delete();
+        $removeVoucherDetail = PurchaseVoucherDetail::where('purchase_stock_master_id', '=', $id)->delete();
 
         if($from != "update")
         {

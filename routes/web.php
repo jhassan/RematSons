@@ -60,7 +60,7 @@ Route::group(
       Route::get('/', array('as' => 'sale_stock', 'uses' => 'SaleStockController@index'));
       Route::get('{id}/edit', array('as' => 'sale_stock.update', 'uses' => 'SaleStockController@edit'));
       Route::post('{id}/edit', 'SaleStockController@update');
-      Route::get('delete_product', array('as'=>'delete_product', 'uses' => 'SaleStockController@destroy'));
+      Route::get('delete_sale_stock', array('as'=>'delete_sale_stock', 'uses' => 'SaleStockController@destroy'));
       Route::get('check_total_stcok', array('as'=>'check_total_stcok', 'uses' => 'SaleStockController@check_total_stcok'));
       Route::get('{id}/check_item_stock_detail', array('as'=>'check_item_stock_detail', 'uses' => 'SaleStockController@check_item_stock_detail'));
   });
@@ -80,5 +80,12 @@ Route::group(
       Route::get('update_list_price', array('as'=>'update_list_price', 'uses' => 'ListPriceController@update_list_price'));
       
   });
+
+// Accounts
+Route::group(
+  array('prefix' => '/accounts','before' => ''), function () {
+      Route::get('list_transections', array('as' => 'list_transections', 'uses' => 'AccountController@list_transections'));
+  });
+
 
 

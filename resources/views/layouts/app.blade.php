@@ -136,6 +136,16 @@
                             <li class="current"><a href="/list_price">Update List Price</a></li>
                         </ul>
                     </li>
+                    <li class="submenu current {{ Request::is('list_transections') ? 'open' : '' }}">
+                         <a href="#">
+                            <i class="glyphicon glyphicon-list"></i> Accounts Management
+                            <span class="caret pull-right"></span>
+                         </a>
+                         <!-- Sub menu -->
+                         <ul>
+                            <li class="current"><a href="/accounts/list_transections">List of Transections</a></li>
+                        </ul>
+                    </li>
                     <li class="submenu current {{ Request::is('reports') ? 'open' : '' }} {{ Request::is('reports/view_purchase_stock') ? 'open' : '' }} {{ Request::is('reports/view_sale_stock') ? 'open' : '' }} {{ Request::is('reports/view_today_stock') ? 'open' : '' }}">
                          <a href="#">
                             <i class="glyphicon glyphicon-list"></i> Reports Management
